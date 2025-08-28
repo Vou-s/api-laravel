@@ -10,36 +10,32 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function __construct()
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        $token = JWTAuth::fromUser($user);
-
-        return response()->json(['user' => $user, 'token' => $token]);
+        // Semua route harus auth api kecuali login
+        $this->middleware('auth:api', ['except' => ['login']]);
     }
 
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-        if (! $token = JWTAuth::attempt($credentials)) {
+
+        // Gunakan guard api
+        if (!$token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
         return response()->json(['token' => $token]);
     }
 
     public function profile()
     {
-        return response()->json(auth()->user());
+        return response()->json(auth('api')->user());
     }
 
     public function logout()
     {
-        auth()->logout();
+        auth('api')->logout();
         return response()->json(['message' => 'Successfully logged out']);
     }
 }

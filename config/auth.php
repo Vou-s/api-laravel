@@ -34,14 +34,6 @@ return [
     | Supported: "session"
     |
     */
-
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
-    ],
-
     /*
     |--------------------------------------------------------------------------
     | User Providers
@@ -109,7 +101,6 @@ return [
     | confirmation screen. By default, the timeout lasts for three hours.
     |
     */
-
     'guards' => [
         'web' => [
             'driver' => 'session',
@@ -119,9 +110,9 @@ return [
         'api' => [
             'driver' => 'jwt',
             'provider' => 'users',
+            'hash' => false,
         ],
     ],
-
 
 
 
