@@ -38,3 +38,17 @@
 #35 D:\\api-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(16): require_once('D:\\\\api-laravel\\\\...')
 #36 {main}
 "} 
+[2025-08-29 07:30:16] local.ERROR: syntax error, unexpected token "?" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"?\" at D:\\api-laravel\\app\\Providers\\RouteServiceProvider.php:51)
+[stacktrace]
+#0 D:\\api-laravel\\vendor\\composer\\ClassLoader.php(427): Composer\\Autoload\\{closure}('D:\\\\api-laravel\\\\...')
+#1 D:\\api-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(880): Composer\\Autoload\\ClassLoader->loadClass('App\\\\Providers\\\\R...')
+#2 D:\\api-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(814): Illuminate\\Foundation\\Application->resolveProvider('App\\\\Providers\\\\R...')
+#3 D:\\api-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\ProviderRepository.php(75): Illuminate\\Foundation\\Application->register('App\\\\Providers\\\\R...')
+#4 D:\\api-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(794): Illuminate\\Foundation\\ProviderRepository->load(Array)
+#5 D:\\api-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\RegisterProviders.php(17): Illuminate\\Foundation\\Application->registerConfiguredProviders()
+#6 D:\\api-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(286): Illuminate\\Foundation\\Bootstrap\\RegisterProviders->bootstrap(Object(Illuminate\\Foundation\\Application))
+#7 D:\\api-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(447): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#8 D:\\api-laravel\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#9 D:\\api-laravel\\artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 
