@@ -8,17 +8,16 @@ class Product extends Model
 {
     public $table = 'products';
 
-    public $fillable = [
-        
+    protected $fillable = [
+        'name',
+        'price',
+        'stock',
+        'description',
     ];
+    protected $casts = [];
 
-    protected $casts = [
-        
-    ];
+    protected $guarded = [];
 
-    public static array $rules = [
-        
-    ];
 
-    
+    public static array $rules = [];
 }
