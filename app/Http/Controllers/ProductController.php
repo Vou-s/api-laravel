@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\sr;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -12,22 +12,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        // Contoh data dummy
-        $products = [
-            ['id' => 1, 'name' => 'Laptop', 'price' => 15000000],
-            ['id' => 2, 'name' => 'Mouse', 'price' => 250000],
-            ['id' => 3, 'name' => 'Keyboard', 'price' => 750000],
-        ];
-
+        // Ambil semua produk dari database
+        $products = Product::all();
         return response()->json($products);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -35,38 +22,45 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name'  => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $product = Product::create($request->all());
+
+        return response()->json($product, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(sr $sr)
+    public function show(Product $product)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(sr $sr)
-    {
-        //
+        return response()->json($product);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, sr $sr)
+    public function update(Request $request, Product $product)
     {
-        //
+        $request->validate([
+            'name'  => 'sometimes|string|max:255',
+            'price' => 'sometimes|numeric|min:0',
+        ]);
+
+        $product->update($request->all());
+
+        return response()->json($product);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(sr $sr)
+    public function destroy(Product $product)
     {
-        //
+        $product->delete();
+        return response()->json(['message' => 'Product deleted successfully']);
     }
 }
