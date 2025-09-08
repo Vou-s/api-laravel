@@ -1,35 +1,45 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PaymentController; // <- tambahkan
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes
+| Public Routes
 |--------------------------------------------------------------------------
 */
+Route::prefix('auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
 Route::get('/products', [ProductController::class, 'index']);
 
+// Biarkan hanya 1 endpoint orders (lebih konsisten pakai plural)
 Route::post('/orders', [OrderController::class, 'store']);
-Route::post('/order', [OrderController::class, 'store']); // biar dua-duanya bisa
 
-// Protected routes (JWT)
+/*
+|--------------------------------------------------------------------------
+| Protected Routes (JWT)
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth:api')->group(function () {
+
+    // User profile
     Route::get('/me', [AuthController::class, 'profile']);
-    Route::get('/user', [AuthController::class, 'profile']); // alias baru
+    Route::get('/user', [AuthController::class, 'profile']); // alias
+
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Orders
-    Route::get('orders', [OrderController::class, 'userOrders']);
-    Route::post('order', [OrderController::class, 'store']);
+    Route::get('/orders', [OrderController::class, 'userOrders']);
+    Route::post('/orders', [OrderController::class, 'store']); // tetap boleh create
 
     // Midtrans Payment
-    Route::post('payment', [PaymentController::class, 'createTransaction']);
+    Route::prefix('payments')->group(function () {
+        Route::post('/', [PaymentController::class, 'createTransaction']);
+    });
 });
