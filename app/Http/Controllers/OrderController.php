@@ -68,7 +68,7 @@ class OrderController extends Controller
             // 'user_id' => auth()->check() ? auth()->id() : null,
             'user_id' => auth()->id() ?? null,
             'total' => $total,
-            'payment_status' => 'pending',
+            'status' => 'pending',
         ]);
 
         // Simpan items
