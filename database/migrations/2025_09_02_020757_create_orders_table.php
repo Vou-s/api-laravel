@@ -16,6 +16,8 @@ return new class extends Migration {
             $table->string('midtrans_order_id')->nullable();
             $table->string('midtrans_transaction_id')->nullable();
             $table->text('payment_response')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained();
+
             $table->timestamps();
         });
     }

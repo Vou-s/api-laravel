@@ -13,6 +13,8 @@ class Order extends Model
 
     protected static function booted()
     {
+        parent::boot();
+
         static::creating(function ($model) {
             if (!$model->id) $model->id = (string) Str::uuid();
         });
