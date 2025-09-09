@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Midtrans\Snap;
 use Midtrans\Config;
+use App\Models\OrderItem;
 
 class OrderController extends Controller
 {
@@ -39,45 +40,34 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
             'customer.name' => 'required|string',
             'customer.email' => 'required|email',
         ]);
 
-        $total = 0;
-        $item_details = [];
+        $product = Product::findOrFail($request->product_id);
+        $subtotal = $product->price * $request->quantity;
 
-        foreach ($request->items as $item) {
-            $product = Product::findOrFail($item['product_id']);
-            $subtotal = $product->price * $item['quantity'];
-            $total += $subtotal;
+        $order = Order::create([
+            'user_id' => auth()->id() ?? null,
+            'product_id' => $product->id,
+            'quantity' => $request->quantity,
+            'total' => $subtotal,
+            'payment_status' => 'pending',
+        ]);
 
-            // Simpan order ke database
-            $order = Order::create([
-                'user_id'       => auth()->id() ?? null,
-                'product_id'    => $product->id,
-                'quantity'      => $item['quantity'],
-                'total'         => $subtotal,
-                'payment_status'=> 'pending',
-            ]);
-
-            $item_details[] = [
-                'id'       => $product->id,
-                'price'    => $product->price,
-                'quantity' => $item['quantity'],
-                'name'     => $product->name,
-            ];
-        }
-
-        // Midtrans Snap Params
         $params = [
             'transaction_details' => [
-                'order_id'      => uniqid(),
-                'gross_amount'  => $total,
+                'order_id'     => $order->id,
+                'gross_amount' => $subtotal,
             ],
-            'item_details' => $item_details,
+            'item_details' => [[
+                'id' => $product->id,
+                'price' => $product->price,
+                'quantity' => $request->quantity,
+                'name' => $product->name,
+            ]],
             'customer_details' => [
                 'first_name' => $request->customer['name'],
                 'email'      => $request->customer['email'],
@@ -87,7 +77,7 @@ class OrderController extends Controller
         $snapToken = Snap::getSnapToken($params);
 
         return response()->json([
-            'total' => $total,
+            'order' => $order,
             'snap_token' => $snapToken,
         ]);
     }
