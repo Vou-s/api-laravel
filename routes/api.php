@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductController;
 | Public Routes
 |--------------------------------------------------------------------------
 */
+
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
@@ -40,8 +41,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Orders
-    Route::get('/orders', [OrderController::class, 'userOrders']);
-    Route::post('/orders', [OrderController::class, 'store']); // tetap boleh create
+    Route::apiResource('orders', OrderController::class);
 
     // Midtrans Payment
     Route::prefix('payments')->group(function () {
