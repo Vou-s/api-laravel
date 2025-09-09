@@ -12,20 +12,14 @@ use App\Http\Controllers\ProductController;
 |--------------------------------------------------------------------------
 */
 
+// Auth
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-// Route::get('/products', [ProductController::class, 'index']);
-
-// // Biarkan hanya 1 endpoint orders (lebih konsisten pakai plural)
-// Route::post('/orders', [OrderController::class, 'store']);
-// Route::get('/orders', [OrderController::class, 'store']);
-
-
-Route::apiResource('products', ProductController::class);
-Route::apiResource('orders', OrderController::class)->only(['index', 'show']);
+// Public products (bisa dilihat tanpa login)
+Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 
 /*
 |--------------------------------------------------------------------------
@@ -34,19 +28,14 @@ Route::apiResource('orders', OrderController::class)->only(['index', 'show']);
 */
 Route::middleware('auth:api')->group(function () {
 
-    // User profile
+    // Profile & logout
     Route::get('/me', [AuthController::class, 'profile']);
     Route::get('/user', [AuthController::class, 'profile']); // alias
-
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/orders', [OrderController::class, 'store']);
+
     // Orders
-    // Route::apiResource('orders', OrderController::class);
-    // Route::post('/orders', [OrderController::class, 'store']);
-    // Route::get('/orders', [OrderController::class, 'index']);
-    // Route::get('/orders/{id}', [OrderController::class, 'show']);
-    // Route::put('/orders/{id}', [OrderController::class, 'update']);
-    // Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+    // Semua endpoint orders sekarang protected
+    Route::apiResource('orders', OrderController::class);
 
     // Midtrans Payment
     Route::prefix('payments')->group(function () {
