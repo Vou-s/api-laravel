@@ -12,20 +12,20 @@ use App\Http\Controllers\ProductController;
 |--------------------------------------------------------------------------
 */
 
-// Auth
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-// Products (public)
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{id}', [ProductController::class, 'show']);
+// Route::get('/products', [ProductController::class, 'index']);
 
-// Orders (public, bisa diubah ke protected nanti)
-Route::get('/orders', [OrderController::class, 'index']);
-Route::get('/orders/{id}', [OrderController::class, 'show']);
-Route::post('/orders', [OrderController::class, 'store']); // public, tanpa auth
+// // Biarkan hanya 1 endpoint orders (lebih konsisten pakai plural)
+// Route::post('/orders', [OrderController::class, 'store']);
+// Route::get('/orders', [OrderController::class, 'store']);
+
+
+Route::apiResource('products', ProductController::class);
+Route::apiResource('orders', OrderController::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -36,11 +36,17 @@ Route::middleware('auth:api')->group(function () {
 
     // User profile
     Route::get('/me', [AuthController::class, 'profile']);
+    Route::get('/user', [AuthController::class, 'profile']); // alias
+
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Orders (protected)
-    Route::put('/orders/{id}', [OrderController::class, 'update']);
-    Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+    // Orders
+    // Route::apiResource('orders', OrderController::class);
+    // Route::post('/orders', [OrderController::class, 'store']);
+    // Route::get('/orders', [OrderController::class, 'index']);
+    // Route::get('/orders/{id}', [OrderController::class, 'show']);
+    // Route::put('/orders/{id}', [OrderController::class, 'update']);
+    // Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
 
     // Midtrans Payment
     Route::prefix('payments')->group(function () {
