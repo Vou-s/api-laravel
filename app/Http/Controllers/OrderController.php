@@ -60,6 +60,7 @@ class OrderController extends Controller
                 'quantity' => $item['quantity'],
                 'price' => $product->price,
                 'subtotal' => $subtotal,
+                'name' => $product->name, // simpan nama
             ];
         }
 
@@ -91,9 +92,10 @@ class OrderController extends Controller
                     'id' => $oi['product_id'],
                     'price' => $oi['price'],
                     'quantity' => $oi['quantity'],
-                    'name' => Product::find($oi['product_id'])->name,
+                    'name' => $oi['name'],
                 ];
             }, $orderItems),
+
             'customer_details' => [
                 'first_name' => $request->customer['name'],
                 'email'      => $request->customer['email'],
