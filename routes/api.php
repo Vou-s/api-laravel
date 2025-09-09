@@ -16,10 +16,15 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-Route::get('/products', [ProductController::class, 'index']);
+// Route::get('/products', [ProductController::class, 'index']);
 
-// Biarkan hanya 1 endpoint orders (lebih konsisten pakai plural)
-Route::post('/orders', [OrderController::class, 'store']);
+// // Biarkan hanya 1 endpoint orders (lebih konsisten pakai plural)
+// Route::post('/orders', [OrderController::class, 'store']);
+// Route::get('/orders', [OrderController::class, 'store']);
+
+
+Route::apiResource('products', ProductController::class);
+Route::apiResource('orders', OrderController::class);
 
 /*
 |--------------------------------------------------------------------------

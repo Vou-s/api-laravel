@@ -7,19 +7,23 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // GET /products
     public function index()
     {
-        // Ambil semua produk dari database
-        $products = Product::all();
-        return response()->json($products);
+        return response()->json(Product::all());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // GET /products/{id}
+    public function show($id)
+    {
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+        return response()->json($product);
+    }
+
+    // POST /products
     public function store(Request $request)
     {
         $request->validate([
@@ -28,38 +32,34 @@ class ProductController extends Controller
         ]);
 
         $product = Product::create($request->all());
-
         return response()->json($product, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
+    // PUT /products/{id}
+    public function update(Request $request, $id)
     {
-        return response()->json($product);
-    }
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Product $product)
-    {
         $request->validate([
             'name'  => 'sometimes|string|max:255',
             'price' => 'sometimes|numeric|min:0',
         ]);
 
         $product->update($request->all());
-
         return response()->json($product);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Product $product)
+    // DELETE /products/{id}
+    public function destroy($id)
     {
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
         $product->delete();
         return response()->json(['message' => 'Product deleted successfully']);
     }
