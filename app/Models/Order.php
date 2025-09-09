@@ -8,15 +8,18 @@ use Illuminate\Support\Str;
 class Order extends Model
 {
     public $incrementing = false;
+
     protected $keyType = 'string';
+
     protected $fillable = ['id', 'user_id', 'total', 'status', 'payment_method', 'midtrans_order_id', 'midtrans_transaction_id', 'payment_response'];
 
     protected static function booted()
     {
         parent::boot();
-
         static::creating(function ($model) {
-            if (!$model->id) $model->id = (string) Str::uuid();
+            if (empty($model->id)) {
+                $model->id = (string) \Str::uuid();
+            }
         });
     }
 
