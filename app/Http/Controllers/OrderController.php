@@ -40,11 +40,13 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
             'customer.name' => 'required|string',
             'customer.email' => 'required|email',
         ]);
+
 
         $product = Product::findOrFail($request->product_id);
         $subtotal = $product->price * $request->quantity;
