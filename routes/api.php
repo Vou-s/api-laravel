@@ -25,7 +25,7 @@ Route::prefix('auth')->group(function () {
 
 
 Route::apiResource('products', ProductController::class);
-// Route::apiResource('orders', OrderController::class);
+Route::apiResource('orders', OrderController::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -41,12 +41,12 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Orders
-    Route::apiResource('orders', OrderController::class);
-    Route::post('/orders', [OrderController::class, 'store']);
-    Route::get('/orders', [OrderController::class, 'index']);
-    Route::get('/orders/{id}', [OrderController::class, 'show']);
-    Route::put('/orders/{id}', [OrderController::class, 'update']);
-    Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+    // Route::apiResource('orders', OrderController::class);
+    // Route::post('/orders', [OrderController::class, 'store']);
+    // Route::get('/orders', [OrderController::class, 'index']);
+    // Route::get('/orders/{id}', [OrderController::class, 'show']);
+    // Route::put('/orders/{id}', [OrderController::class, 'update']);
+    // Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
 
     // Midtrans Payment
     Route::prefix('payments')->group(function () {
