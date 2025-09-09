@@ -25,7 +25,7 @@ Route::prefix('auth')->group(function () {
 
 
 Route::apiResource('products', ProductController::class);
-Route::apiResource('orders', OrderController::class);
+// Route::apiResource('orders', OrderController::class);
 
 /*
 |--------------------------------------------------------------------------
