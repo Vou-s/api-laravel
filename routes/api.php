@@ -25,7 +25,7 @@ Route::prefix('auth')->group(function () {
 
 
 Route::apiResource('products', ProductController::class);
-Route::apiResource('orders', OrderController::class);
+Route::apiResource('orders', OrderController::class)->only(['index', 'show']);
 
 /*
 |--------------------------------------------------------------------------
@@ -39,7 +39,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user', [AuthController::class, 'profile']); // alias
 
     Route::post('/logout', [AuthController::class, 'logout']);
-
+    Route::post('/orders', [OrderController::class, 'store']);
     // Orders
     // Route::apiResource('orders', OrderController::class);
     // Route::post('/orders', [OrderController::class, 'store']);
