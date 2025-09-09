@@ -47,29 +47,53 @@ class OrderController extends Controller
             'customer.email' => 'required|email',
         ]);
 
+        $total = 0;
+        $orderItems = [];
 
-        $product = Product::findOrFail($request->product_id);
-        $subtotal = $product->price * $request->quantity;
+        foreach ($request->items as $item) {
+            $product = Product::findOrFail($item['product_id']);
+            $subtotal = $product->price * $item['quantity'];
+            $total += $subtotal;
+
+            $orderItems[] = [
+                'product_id' => $product->id,
+                'quantity' => $item['quantity'],
+                'price' => $product->price,
+                'subtotal' => $subtotal,
+            ];
+        }
 
         $order = Order::create([
             'user_id' => auth()->id() ?? null,
-            'product_id' => $product->id,
-            'quantity' => $request->quantity,
-            'total' => $subtotal,
+            'total' => $total,
             'payment_status' => 'pending',
         ]);
 
+        // Simpan items
+        foreach ($orderItems as $oi) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $oi['product_id'],
+                'quantity' => $oi['quantity'],
+                'price' => $oi['price'],
+                'subtotal' => $oi['subtotal'],
+            ]);
+        }
+
+        // Midtrans Snap Token
         $params = [
             'transaction_details' => [
                 'order_id'     => $order->id,
-                'gross_amount' => $subtotal,
+                'gross_amount' => $total,
             ],
-            'item_details' => [[
-                'id' => $product->id,
-                'price' => $product->price,
-                'quantity' => $request->quantity,
-                'name' => $product->name,
-            ]],
+            'item_details' => array_map(function ($oi) {
+                return [
+                    'id' => $oi['product_id'],
+                    'price' => $oi['price'],
+                    'quantity' => $oi['quantity'],
+                    'name' => Product::find($oi['product_id'])->name,
+                ];
+            }, $orderItems),
             'customer_details' => [
                 'first_name' => $request->customer['name'],
                 'email'      => $request->customer['email'],
