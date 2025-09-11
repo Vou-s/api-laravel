@@ -1,44 +1,50 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PaymentController;
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderItemController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes
+| API Routes
 |--------------------------------------------------------------------------
+| Semua route API project ada di sini.
+| Prefix default = /api
 */
 
-// Auth
+// ✅ AUTH (JWT)
 Route::prefix('auth')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+
+    // Route yang butuh token JWT
+    Route::middleware('auth:api')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::post('refresh', [AuthController::class, 'refresh']);
+        Route::get('me', [AuthController::class, 'me']);
+    });
 });
 
-// Public products (bisa dilihat tanpa login)
-Route::apiResource('products', ProductController::class)->only(['index', 'show']);
-
-/*
-|--------------------------------------------------------------------------
-| Protected Routes (JWT)
-|--------------------------------------------------------------------------
-*/
+// ✅ PROTECTED ROUTES (butuh JWT token)
 Route::middleware('auth:api')->group(function () {
+    // Users
+    Route::apiResource('users', UserController::class);
 
-    // Profile & logout
-    Route::get('/me', [AuthController::class, 'profile']);
-    Route::get('/user', [AuthController::class, 'profile']); // alias
-    Route::post('/logout', [AuthController::class, 'logout']);
+    // Products
+    Route::apiResource('products', ProductController::class);
 
     // Orders
-    // Semua endpoint orders sekarang protected
     Route::apiResource('orders', OrderController::class);
 
-    // Midtrans Payment
-    Route::prefix('payments')->group(function () {
-        Route::post('/', [PaymentController::class, 'createTransaction']);
-    });
+    // Order Items
+    Route::apiResource('order-items', OrderItemController::class);
+
+    // Payments
+    Route::apiResource('payments', PaymentController::class);
 });

@@ -2,34 +2,34 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Order extends Model
 {
-    public $incrementing = false;
+    use HasFactory;
 
-    protected $keyType = 'string';
+    protected $fillable = [
+        'user_id',
+        'total_amount',
+        'status',
+    ];
 
-    protected $fillable = ['id', 'user_id', 'total', 'status', 'payment_method', 'midtrans_order_id', 'midtrans_transaction_id', 'payment_response'];
-
-    protected static function booted()
+    // Relasi: Order milik 1 User
+    public function user()
     {
-        parent::boot();
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = (string) \Str::uuid();
-            }
-        });
+        return $this->belongsTo(User::class);
     }
 
+    // Relasi: Order punya banyak OrderItem
     public function items()
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function product()
+    // Relasi: Order punya 1 Payment
+    public function payment()
     {
-        return $this->hasManyThrough(Product::class, OrderItem::class, 'order_id', 'id', 'id', 'product_id');
+        return $this->hasOne(Payment::class);
     }
 }

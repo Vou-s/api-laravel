@@ -3,157 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\Product;
 use Illuminate\Http\Request;
-use Midtrans\Snap;
-use Midtrans\Config;
-use App\Models\OrderItem;
 
 class OrderController extends Controller
 {
-    public function __construct()
-    {
-        // Midtrans Config
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = config('midtrans.is_production');
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
-    }
-
-    // GET /orders
     public function index()
     {
-        return response()->json(Order::with('product')->get());
+        return Order::with(['user', 'items.product', 'payment'])->get();
     }
 
-    // GET /orders/{id}
-    public function show($id)
-    {
-        $order = Order::with('product')->find($id);
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
-        }
-        return response()->json($order);
-    }
-
-    // POST /orders → Create + Midtrans Snap Token
     public function store(Request $request)
     {
-        // Validasi request
-        $request->validate([
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'customer.name' => 'required|string',
-            'customer.email' => 'required|email',
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'total_amount' => 'required|numeric',
+            'status' => 'string',
         ]);
 
-        try {
-            $total = 0;
-            $orderItems = [];
-
-            // Hitung total dan siapkan items
-            foreach ($request->items as $item) {
-                $product = Product::findOrFail($item['product_id']);
-                $subtotal = $product->price * $item['quantity'];
-                $total += $subtotal;
-
-                $orderItems[] = [
-                    'product_id' => $product->id,
-                    'quantity' => $item['quantity'],
-                    'price' => $product->price,
-                    'subtotal' => $subtotal,
-                    'name' => $product->name,
-                ];
-            }
-
-            // Buat order
-            $order = Order::create([
-                'user_id' => auth()->id() ?? null,
-                'total' => $total,
-                'status' => 'pending', // gunakan 'status' sesuai migration
-            ]);
-
-            // Simpan OrderItems
-            foreach ($orderItems as $oi) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $oi['product_id'],
-                    'quantity' => $oi['quantity'],
-                    'price' => $oi['price'],
-                    'subtotal' => $oi['subtotal'],
-                ]);
-            }
-
-            // Midtrans Snap token
-            $params = [
-                'transaction_details' => [
-                    'order_id'     => $order->id,
-                    'gross_amount' => $total,
-                ],
-                'item_details' => array_map(function ($oi) {
-                    return [
-                        'id' => $oi['product_id'],
-                        'price' => $oi['price'],
-                        'quantity' => $oi['quantity'],
-                        'name' => $oi['name'],
-                    ];
-                }, $orderItems),
-                'customer_details' => [
-                    'first_name' => $request->customer['name'],
-                    'email'      => $request->customer['email'],
-                ],
-            ];
-
-            $snapToken = Snap::getSnapToken($params);
-
-            return response()->json([
-                'order' => $order,
-                'snap_token' => $snapToken,
-            ], 201);
-        } catch (\Exception $e) {
-            \log::error('Order creation error: ' . $e->getMessage());
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        return Order::create($data);
     }
 
-
-    // PUT /orders/{id}
-    public function update(Request $request, $id)
+    public function show(Order $order)
     {
-        $order = Order::find($id);
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
-        }
+        return $order->load(['user', 'items.product', 'payment']);
+    }
 
-        $request->validate([
-            'quantity' => 'sometimes|integer|min:1',
-            'payment_status' => 'sometimes|string|in:pending,paid,cancelled',
+    public function update(Request $request, Order $order)
+    {
+        $data = $request->validate([
+            'user_id' => 'exists:users,id',
+            'total_amount' => 'numeric',
+            'status' => 'string',
         ]);
 
-        if ($request->has('quantity')) {
-            $order->quantity = $request->quantity;
-            $order->total = $order->product->price * $request->quantity;
-        }
-
-        if ($request->has('payment_status')) {
-            $order->payment_status = $request->payment_status;
-        }
-
-        $order->save();
-
-        return response()->json($order);
+        $order->update($data);
+        return $order;
     }
 
-    // DELETE /orders/{id}
-    public function destroy($id)
+    public function destroy(Order $order)
     {
-        $order = Order::find($id);
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
-        }
-
         $order->delete();
-        return response()->json(['message' => 'Order deleted successfully']);
+        return response()->noContent();
     }
 }

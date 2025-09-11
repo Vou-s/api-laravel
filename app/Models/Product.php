@@ -9,25 +9,16 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $table = 'products';
-
-    // Kolom yang bisa diisi mass-assignment
     protected $fillable = [
         'name',
+        'description',
         'price',
         'stock',
-        'description',
     ];
 
-    // Casting field (price jadi float biar lebih mudah dipakai di frontend)
-    protected $casts = [
-        'price' => 'float',
-        'stock' => 'integer',
-    ];
-
-    // Relasi ke Order (satu produk bisa ada di banyak order)
-    public function orders()
+    // Relasi: Product ada di banyak OrderItem
+    public function orderItems()
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(OrderItem::class);
     }
 }

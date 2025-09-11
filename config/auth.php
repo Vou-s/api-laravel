@@ -106,11 +106,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
         'api' => [
-            'driver' => 'jwt',  // Make sure this is 'jwt'
+            'driver' => 'jwt',
             'provider' => 'users',
         ],
     ],
+
 
 
     'password_timeout' => 10800,

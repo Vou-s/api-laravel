@@ -2,43 +2,49 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Payment;
 use Illuminate\Http\Request;
-use App\Services\MidtransService;
 
 class PaymentController extends Controller
 {
-    protected $midtrans;
-
-    public function __construct(MidtransService $midtrans)
+    public function index()
     {
-        $this->midtrans = $midtrans;
+        return Payment::with('order')->get();
     }
 
-    public function checkout(Request $request)
+    public function store(Request $request)
     {
-        $params = [
-            'transaction_details' => [
-                'order_id' => uniqid(),
-                'gross_amount' => $request->amount,
-            ],
-            'customer_details' => [
-                'first_name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-            ],
-        ];
-
-        $transaction = $this->midtrans->createTransaction($params);
-
-        return response()->json([
-            'token' => $transaction->token,
-            'redirect_url' => $transaction->redirect_url,
+        $data = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'amount' => 'required|numeric',
+            'method' => 'required|string',
+            'status' => 'string',
         ]);
+
+        return Payment::create($data);
     }
 
-    public function notification(Request $request)
+    public function show(Payment $payment)
     {
-        // Handle webhook notification dari Midtrans
-        return response()->json(['status' => 'ok']);
+        return $payment->load('order');
+    }
+
+    public function update(Request $request, Payment $payment)
+    {
+        $data = $request->validate([
+            'order_id' => 'exists:orders,id',
+            'amount' => 'numeric',
+            'method' => 'string',
+            'status' => 'string',
+        ]);
+
+        $payment->update($data);
+        return $payment;
+    }
+
+    public function destroy(Payment $payment)
+    {
+        $payment->delete();
+        return response()->noContent();
     }
 }

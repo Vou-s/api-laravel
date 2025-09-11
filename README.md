@@ -12,17 +12,23 @@ php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
 
-# Generate model Order dengan migration, controller, dan seeder
+# PowerShell Script: generate-entities.ps1
+
+# User
+php artisan make:model User -mcr
+
+# Product
+php artisan make:model Product -mcr
+
+# Order
 php artisan make:model Order -mcr
-php artisan make:seeder OrderSeeder
 
-# Generate model OrderItem dengan migration, controller, dan seeder
+# OrderItem
 php artisan make:model OrderItem -mcr
-php artisan make:seeder OrderItemSeeder
 
-# Generate model Payment dengan migration, controller, dan seeder
+# Payment
 php artisan make:model Payment -mcr
-php artisan make:seeder PaymentSeeder
+
 
 php artisan make:factory UserFactory --model=User
 
