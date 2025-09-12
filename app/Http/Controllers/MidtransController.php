@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -13,14 +12,11 @@ class MidtransController extends Controller
     public function __construct()
     {
         Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        Config::$isProduction = false; // true jika sudah live
+        Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
         Config::$isSanitized = true;
         Config::$is3ds = true;
     }
 
-    /**
-     * Ambil Snap Token berdasarkan Order
-     */
     public function getToken($orderId)
     {
         try {
@@ -28,36 +24,62 @@ class MidtransController extends Controller
 
             $params = [
                 'transaction_details' => [
-                    'order_id'     => 'ORDER-' . $order->id,
+                    'order_id' => 'ORDER-' . $order->id,
                     'gross_amount' => (int) $order->total_amount,
                 ],
                 'customer_details' => [
                     'first_name' => $order->user->name,
-                    'email'      => $order->user->email,
-                    'phone'      => $order->user->phone ?? '0811111111',
+                    'email' => $order->user->email,
+                    'phone' => $order->user->phone ?? '0811111111',
                 ],
-                'item_details' => $order->items->map(function ($item) {
+                'item_details' => $order->items->map(function($item){
                     return [
-                        'id'       => $item->product_id,
-                        'price'    => (int)$item->price,
+                        'id' => $item->product_id,
+                        'price' => (int)$item->price,
                         'quantity' => $item->quantity,
-                        'name'     => $item->product->name,
+                        'name' => $item->product->name,
                     ];
                 })->toArray(),
             ];
 
             $snapToken = Snap::getSnapToken($params);
 
-            return response()->json([
-                'success' => true,
-                'token'   => $snapToken
-            ]);
+            return response()->json(['success' => true, 'token' => $snapToken]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal ambil snap token',
-                'error'   => $e->getMessage()
+                'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function callback(Request $request)
+    {
+        $notification = new Notification();
+
+        $orderId = (int) str_replace('ORDER-', '', $notification->order_id);
+        $order = Order::find($orderId);
+
+        if (!$order) return response()->json(['success' => false, 'message' => 'Order tidak ditemukan'], 404);
+
+        switch ($notification->transaction_status) {
+            case 'capture':
+            case 'settlement':
+                $order->status = 'paid';
+                break;
+            case 'pending':
+                $order->status = 'pending';
+                break;
+            case 'deny':
+            case 'expire':
+            case 'cancel':
+                $order->status = 'failed';
+                break;
+        }
+
+        $order->save();
+        return response()->json(['success' => true]);
     }
 }
