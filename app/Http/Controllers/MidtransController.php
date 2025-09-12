@@ -23,56 +23,41 @@ class MidtransController extends Controller
      */
     public function getToken($orderId)
     {
-        $order = Order::with('user')->findOrFail($orderId);
+        try {
+            $order = Order::with(['user', 'items.product'])->findOrFail($orderId);
 
-        $params = [
-            'transaction_details' => [
-                'order_id'     => 'ORDER-' . $order->id,
-                'gross_amount' => (int) $order->total_amount,
-            ],
-            'customer_details' => [
-                'first_name' => $order->user->name,
-                'email'      => $order->user->email,
-                'phone'      => $order->user->phone ?? '0811111111',
-            ],
-        ];
+            $params = [
+                'transaction_details' => [
+                    'order_id'     => 'ORDER-' . $order->id,
+                    'gross_amount' => (int) $order->total_amount,
+                ],
+                'customer_details' => [
+                    'first_name' => $order->user->name,
+                    'email'      => $order->user->email,
+                    'phone'      => $order->user->phone ?? '0811111111',
+                ],
+                'item_details' => $order->items->map(function ($item) {
+                    return [
+                        'id'       => $item->product_id,
+                        'price'    => (int)$item->price,
+                        'quantity' => $item->quantity,
+                        'name'     => $item->product->name,
+                    ];
+                })->toArray(),
+            ];
 
-        $snapToken = \Midtrans\Snap::getSnapToken($params);
+            $snapToken = Snap::getSnapToken($params);
 
-        return response()->json([
-            'success' => true,
-            'token'   => $snapToken
-        ]);
-    }
-
-
-    /**
-     * Callback dari Midtrans (notifikasi status pembayaran)
-     */
-    public function callback(Request $request)
-    {
-        $notification = new Notification();
-
-        $orderId = $notification->order_id; // ORDER-123
-        $status  = $notification->transaction_status;
-        $fraud   = $notification->fraud_status;
-
-        // ambil order_id numeric dari ORDER-123
-        $orderDbId = (int) str_replace('ORDER-', '', $orderId);
-        $order = Order::find($orderDbId);
-
-        if ($status == 'capture' && $fraud == 'accept') {
-            $order->status = 'paid';
-        } elseif ($status == 'settlement') {
-            $order->status = 'paid';
-        } elseif ($status == 'pending') {
-            $order->status = 'pending';
-        } elseif ($status == 'deny' || $status == 'expire' || $status == 'cancel') {
-            $order->status = 'failed';
+            return response()->json([
+                'success' => true,
+                'token'   => $snapToken
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal ambil snap token',
+                'error'   => $e->getMessage()
+            ], 500);
         }
-
-        $order->save();
-
-        return response()->json(['success' => true]);
     }
 }
