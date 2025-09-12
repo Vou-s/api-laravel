@@ -1,14 +1,13 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\MidtransController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,12 +17,18 @@ use App\Http\Controllers\PaymentController;
 | Prefix default = /api
 */
 
-// ✅ AUTH (JWT)
+// ===================
+// 🔓 Public Routes
+// ===================
+Route::get('/products', [ProductController::class, 'index']);
+
+// ===================
+// 🔐 Auth Routes (JWT)
+// ===================
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
 
-    // Route yang butuh token JWT
     Route::middleware('auth:api')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('refresh', [AuthController::class, 'refresh']);
@@ -31,13 +36,15 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// ✅ PROTECTED ROUTES (butuh JWT token)
+// ===================
+// 🔐 Protected Routes
+// ===================
 Route::middleware('auth:api')->group(function () {
     // Users
     Route::apiResource('users', UserController::class);
 
-    // Products
-    Route::apiResource('products', ProductController::class);
+    // Products (kecuali index, karena sudah public)
+    Route::apiResource('products', ProductController::class)->except(['index']);
 
     // Orders
     Route::apiResource('orders', OrderController::class);
@@ -47,4 +54,15 @@ Route::middleware('auth:api')->group(function () {
 
     // Payments
     Route::apiResource('payments', PaymentController::class);
+
+    // Midtrans (user-initiated)
+    // Midtrans → Snap Token
+    Route::get('/midtrans/token/{orderId}', [MidtransController::class, 'getToken']);
 });
+
+
+// ===================
+// 🔄 Midtrans Callback
+// ===================
+// ⚠️ Tidak boleh pakai JWT, dipanggil langsung oleh Midtrans server
+Route::post('/midtrans/callback', [MidtransController::class, 'callback']);

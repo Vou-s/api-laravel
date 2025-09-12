@@ -10,9 +10,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'total_amount',
-        'status',
+        'user_id', 'total_amount', 'status', 'payment_method'
     ];
 
     // Relasi: Order milik 1 User

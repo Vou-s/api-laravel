@@ -12,6 +12,9 @@ php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
 
+php artisan route:list
+
+
 # PowerShell Script: generate-entities.ps1
 
 # User
