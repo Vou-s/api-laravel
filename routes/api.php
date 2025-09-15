@@ -55,9 +55,11 @@ Route::middleware('auth:api')->group(function () {
     // Payments
     Route::apiResource('payments', PaymentController::class);
 
-    // Midtrans (user-initiated)
-    // Midtrans → Snap Token
-    Route::get('/midtrans/token/{orderId}', [MidtransController::class, 'getToken']);
+    // ✅ Midtrans Snap Token
+    Route::post('/midtrans/token', [PaymentController::class, 'getSnapToken']);
+
+    // Generate Snap token
+    Route::get('payments/snap-token', [PaymentController::class, 'getSnapToken']);
 });
 
 
@@ -66,3 +68,4 @@ Route::middleware('auth:api')->group(function () {
 // ===================
 // ⚠️ Tidak boleh pakai JWT, dipanggil langsung oleh Midtrans server
 Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
+// Route::post('/midtrans/token/{orderId}', [PaymentController::class, 'getSnapToken']);

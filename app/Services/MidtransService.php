@@ -9,14 +9,22 @@ class MidtransService
 {
     public function __construct()
     {
-        Config::$serverKey = config('services.midtrans.serverKey');
-        Config::$isProduction = config('services.midtrans.isProduction', false);
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = true;
         Config::$is3ds = true;
     }
 
-    public function createTransaction(array $params)
+    public function createTransaction($orderId, $amount, $customer = [])
     {
-        return Snap::createTransaction($params);
+        $params = [
+            'transaction_details' => [
+                'order_id' => $orderId,
+                'gross_amount' => $amount,
+            ],
+            'customer_details' => $customer,
+        ];
+
+        return Snap::getSnapToken($params);
     }
 }

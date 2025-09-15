@@ -32,10 +32,12 @@ return [
     ],
 
     'midtrans' => [
-        'serverKey' => env('MIDTRANS_SERVER_KEY'),
-        'clientKey' => env('MIDTRANS_CLIENT_KEY'),
-        'isProduction' => env('MIDTRANS_PRODUCTION', false),
+        'merchant_id' => env('MIDTRANS_MERCHANT_ID'),
+        'client_key' => env('MIDTRANS_CLIENT_KEY'),
+        'server_key' => env('MIDTRANS_SERVER_KEY'),
+        'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
     ],
+
 
 
 ];
