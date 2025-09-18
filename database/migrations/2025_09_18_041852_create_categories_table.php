@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('name')->unique(); // nama kategori unik
             $table->timestamps();
         });
     }
@@ -19,4 +19,3 @@ return new class extends Migration {
         Schema::dropIfExists('categories');
     }
 };
-

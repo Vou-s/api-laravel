@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class SubCategory extends Model
 {
     use HasFactory;
-
+    protected $table = 'subcategories';
     protected $fillable = ['category_id', 'name'];
 
     public function category()
@@ -20,5 +20,4 @@ class SubCategory extends Model
     {
         return $this->hasMany(Product::class);
     }
-
 }

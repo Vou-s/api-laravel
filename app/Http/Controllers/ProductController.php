@@ -7,11 +7,19 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Product::all();
-        return response()->json($products);
+        $query = Product::query();
+
+        if ($request->subcategory_id) {
+            $query->where('subcategory_id', $request->subcategory_id);
+        } elseif ($request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        return response()->json($query->get());
     }
+
 
     public function store(Request $request)
     {
