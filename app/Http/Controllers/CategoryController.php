@@ -9,9 +9,8 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        // Eager load subcategories supaya frontend dapat langsung
         $categories = Category::with('subcategories')->get();
-        return response()->json(['data' => $categories]);
+        return response()->json($categories);
     }
 
     public function subcategories($id)
