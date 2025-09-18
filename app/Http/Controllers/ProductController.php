@@ -10,6 +10,7 @@ class ProductController extends Controller
     public function index()
     {
         return Product::all();
+        return response()->json($products);
     }
 
     public function store(Request $request)

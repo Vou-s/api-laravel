@@ -8,6 +8,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\MidtransController;
+use App\Http\Controllers\Api\CategoryController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +23,8 @@ use App\Http\Controllers\MidtransController;
 // 🔓 Public Routes
 // ===================
 Route::get('/products', [ProductController::class, 'index']);
-
+// Route::get('/products', [ProductController::class, 'index']);
+Route::get('/categories', [CategoryController::class, 'index']); // ← Tambahkan ini
 // ===================
 // 🔐 Auth Routes (JWT)
 // ===================

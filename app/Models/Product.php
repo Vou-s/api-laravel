@@ -7,18 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory;
+ use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'stock',
+        'name', 'description', 'price', 'image_url', 'category_id', 'subcategory_id'
     ];
 
-    // Relasi: Product ada di banyak OrderItem
-    public function orderItems()
+    public function category()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->belongsTo(Category::class);
+    }
+
+    public function subcategory()
+    {
+        return $this->belongsTo(Subcategory::class);
     }
 }
