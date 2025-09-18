@@ -33,13 +33,12 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi order + items
         $request->validate([
-            'user_id'       => 'required|exists:users,id',
-            'total_amount'  => 'required|numeric|min:0',
-            'status'        => ['nullable', Rule::in(['pending', 'paid', 'failed'])],
+            'user_id'        => 'required|exists:users,id',
+            'total_amount'   => 'required|numeric|min:1', // harus > 0
+            'status'         => ['nullable', Rule::in(['pending', 'paid', 'failed'])],
             'payment_method' => 'nullable|string',
-            'items'         => 'required|array|min:1',
+            'items'          => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity'   => 'required|integer|min:1',
             'items.*.price'      => 'required|numeric|min:0',
@@ -47,24 +46,23 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // Default status = pending
             $status = $request->status ?? 'pending';
 
-            // Simpan order
+            // Buat order
             $order = Order::create([
-                'user_id' => $request->user_id,
-                'total_amount' => $request->total_amount,
-                'status' => $status,
+                'user_id'        => $request->user_id,
+                'total_amount'   => $request->total_amount,
+                'status'         => $status,
                 'payment_method' => $request->payment_method ?? 'unknown',
             ]);
 
-            // Simpan semua items
+            // Simpan items
             foreach ($request->items as $item) {
                 OrderItem::create([
-                    'order_id' => $order->id,
+                    'order_id'   => $order->id,
                     'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
+                    'quantity'   => $item['quantity'],
+                    'price'      => $item['price'],
                 ]);
             }
 
@@ -72,7 +70,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Order created successfully with items',
+                'message' => 'Order created successfully',
                 'data' => $order->load('items.product')
             ], 201);
         } catch (\Exception $e) {
@@ -85,6 +83,7 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
 
 
     public function show(Order $order)
