@@ -9,7 +9,7 @@ use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\Api\CategoryController;
-
+use App\Http\Controllers\SubcategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\CategoryController;
 Route::get('/products', [ProductController::class, 'index']);
 // Route::get('/products', [ProductController::class, 'index']);
 Route::get('/categories', [CategoryController::class, 'index']); // ← Tambahkan ini
+Route::apiResource('subcategories', SubcategoryController::class);
 // ===================
 // 🔐 Auth Routes (JWT)
 // ===================

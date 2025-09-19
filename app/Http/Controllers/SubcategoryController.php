@@ -2,64 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\subcategory;
+use App\Models\Subcategory;
 use Illuminate\Http\Request;
 
 class SubcategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return response()->json(Subcategory::with('category')->get());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+        ]);
+
+        $subcategory = Subcategory::create($data);
+
+        return response()->json($subcategory, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(subcategory $subcategory)
+    public function show(Subcategory $subcategory)
     {
-        //
+        return response()->json($subcategory->load('category'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(subcategory $subcategory)
+    public function update(Request $request, Subcategory $subcategory)
     {
-        //
+        $data = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'category_id' => 'sometimes|required|exists:categories,id',
+        ]);
+
+        $subcategory->update($data);
+
+        return response()->json($subcategory);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, subcategory $subcategory)
+    public function destroy(Subcategory $subcategory)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(subcategory $subcategory)
-    {
-        //
+        $subcategory->delete();
+        return response()->json(null, 204);
     }
 }
