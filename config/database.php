@@ -59,11 +59,14 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::ATTR_PERSISTENT => true, // 👈 biar koneksi gak bolak-balik
-                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false, // 👈 percepat koneksi SSL Railway
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
-        ],
 
+            // 👇 tambahin ini untuk disable schema dump
+            'dump' => [
+                'schema' => false,
+            ],
+        ],
 
 
         'pgsql' => [

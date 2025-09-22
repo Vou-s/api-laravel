@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB; // <--- ini penting
 
 class SubcategorySeeder extends Seeder
 {
@@ -11,18 +11,16 @@ class SubcategorySeeder extends Seeder
     {
         $categories = [
             'Elektronik' => ['HP', 'Laptop', 'Case'],
-            'Fashion'   => ['Baju', 'Tas', 'Sepatu'],
+            'Fashion' => ['Baju', 'Tas', 'Sepatu'],
             'Peralatan' => ['Alat Rumah Tangga', 'Perkakas'],
-            'Lainnya'   => [],
+            'Lainnya' => [],
         ];
 
         foreach ($categories as $catName => $subs) {
-            // Cek kategori, insert kalau belum ada
             $category = DB::table('categories')->where('name', $catName)->first();
-
             if (!$category) {
                 $categoryId = DB::table('categories')->insertGetId([
-                    'name'       => $catName,
+                    'name' => $catName,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -30,19 +28,17 @@ class SubcategorySeeder extends Seeder
                 $categoryId = $category->id;
             }
 
-            // Tambahkan subkategori jika belum ada
             foreach ($subs as $subName) {
                 $exists = DB::table('subcategories')
                     ->where('category_id', $categoryId)
                     ->where('name', $subName)
                     ->exists();
-
                 if (!$exists) {
                     DB::table('subcategories')->insert([
                         'category_id' => $categoryId,
-                        'name'        => $subName,
-                        'created_at'  => now(),
-                        'updated_at'  => now(),
+                        'name' => $subName,
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ]);
                 }
             }
