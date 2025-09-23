@@ -6,11 +6,10 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
-    // 'allowed_origins' => [
-    //     'http://localhost:5173',            // frontend lokal (Vite/React dev)
-    //     'https://react-frontend-482ba.web.app', // frontend deploy di Firebase
-    // ],
+    'allowed_origins' => [
+        'http://localhost:5173',            // frontend lokal (Vite/React dev)
+        'https://react-frontend-482ba.web.app', // frontend deploy di Firebase
+    ],
 
     'allowed_origins_patterns' => [],
 
