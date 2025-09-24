@@ -7,43 +7,51 @@ use Illuminate\Http\Request;
 
 class SubcategoryController extends Controller
 {
+    // GET /api/subcategories
     public function index()
     {
         return response()->json(Subcategory::with('category')->get());
     }
 
+    // POST /api/subcategories
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate([
+            'name'        => 'required|string|max:100',
             'category_id' => 'required|exists:categories,id',
         ]);
 
-        $subcategory = Subcategory::create($data);
-
+        $subcategory = Subcategory::create($validated);
         return response()->json($subcategory, 201);
     }
 
-    public function show(Subcategory $subcategory)
+    // GET /api/subcategories/{id}
+    public function show($id)
     {
-        return response()->json($subcategory->load('category'));
-    }
-
-    public function update(Request $request, Subcategory $subcategory)
-    {
-        $data = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'category_id' => 'sometimes|required|exists:categories,id',
-        ]);
-
-        $subcategory->update($data);
-
+        $subcategory = Subcategory::with('category')->findOrFail($id);
         return response()->json($subcategory);
     }
 
-    public function destroy(Subcategory $subcategory)
+    // PUT/PATCH /api/subcategories/{id}
+    public function update(Request $request, $id)
     {
+        $subcategory = Subcategory::findOrFail($id);
+
+        $validated = $request->validate([
+            'name'        => 'required|string|max:100',
+            'category_id' => 'required|exists:categories,id',
+        ]);
+
+        $subcategory->update($validated);
+        return response()->json($subcategory);
+    }
+
+    // DELETE /api/subcategories/{id}
+    public function destroy($id)
+    {
+        $subcategory = Subcategory::findOrFail($id);
         $subcategory->delete();
-        return response()->json(null, 204);
+
+        return response()->json(['message' => 'Subcategory deleted successfully']);
     }
 }
