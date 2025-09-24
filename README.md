@@ -14,23 +14,16 @@ php artisan view:clear
 
 php artisan route:list
 
-
-# PowerShell Script: generate-entities.ps1
-
-# User
-php artisan make:model User -mcr
-
-# Product
-php artisan make:model Product -mcr
-
-# Order
-php artisan make:model Order -mcr
-
-# OrderItem
-php artisan make:model OrderItem -mcr
-
-# Payment
-php artisan make:model Payment -mcr
+php artisan make:model Category -m
+php artisan make:model Product -m
+php artisan make:model Order -m
+php artisan make:model OrderItem -m
+php artisan make:model Payment -m
+php artisan make:controller Api/AuthController
+php artisan make:controller Api/CategoryController --api
+php artisan make:controller Api/ProductController --api
+php artisan make:controller Api/OrderController
+php artisan make:controller Api/PaymentController
 
 
 php artisan make:factory UserFactory --model=User

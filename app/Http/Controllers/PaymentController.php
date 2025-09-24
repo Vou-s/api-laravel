@@ -19,6 +19,33 @@ class PaymentController extends Controller
         Config::$is3ds = true;
     }
 
+      public function checkout(Request $request)
+    {
+        // Konfigurasi Midtrans
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        \Midtrans\Config::$isProduction = false; // true kalau production
+        \Midtrans\Config::$isSanitized = true;
+        \Midtrans\Config::$is3ds = true;
+
+        $items = $request->items ?? [];
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => uniqid(),
+                'gross_amount' => collect($items)->sum('price'),
+            ],
+            'item_details' => $items,
+            'customer_details' => [
+                'first_name' => 'Customer',
+                'email' => 'customer@email.com',
+            ],
+        ];
+
+        $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+        return response()->json(['token' => $snapToken]);
+    }
+
     // ✅ Ambil daftar payment
     public function index()
     {
