@@ -8,7 +8,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\MidtransController;
-use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubcategoryController;
 
 /*
