@@ -49,7 +49,7 @@ Route::middleware('auth:api')->group(function () {
 
     // Products (kecuali index, karena sudah public)
     Route::apiResource('products', ProductController::class)->except(['index']);
-
+    Route::apiResource('categories', CategoryController::class)->except(['index']);
     // Orders
     Route::apiResource('orders', OrderController::class);
 
