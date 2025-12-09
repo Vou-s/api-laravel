@@ -1,0 +1,112 @@
+<?php
+
+namespace DummyNamespace;
+
+use DummyFullModel;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+
+/**
+ * @OA\Tag(
+ *     name="DummyModelName",
+ *     description="API Endpoints for DummyModelName"
+ * )
+ */
+class DummyClass extends Controller
+{
+    /**
+     * @OA\Get(
+     *     path="/DummyModelNameLC",
+     *     tags={"DummyModelName"},
+     *     summary="Get list of DummyModelName",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation"
+     *     )
+     * )
+     */
+    public function index(Request $request)
+    {
+        // ...
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/DummyModelNameLC",
+     *     tags={"DummyModelName"},
+     *     summary="Create new DummyModelName",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/DummyModelName")
+     *     ),
+     *     @OA\Response(response=200, description="Created")
+     * )
+     */
+    public function store(DummyCreateRequest $request)
+    {
+        // ...
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/DummyModelNameLC/{id}",
+     *     tags={"DummyModelName"},
+     *     summary="Get DummyModelName detail",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Success"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
+    public function show($id)
+    {
+        // ...
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/DummyModelNameLC/{id}",
+     *     tags={"DummyModelName"},
+     *     summary="Update DummyModelName",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/DummyModelName")
+     *     ),
+     *     @OA\Response(response=200, description="Updated")
+     * )
+     */
+    public function update($id, DummyUpdateRequest $request)
+    {
+        // ...
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/DummyModelNameLC/{id}",
+     *     tags={"DummyModelName"},
+     *     summary="Delete DummyModelName",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Deleted")
+     * )
+     */
+    public function destroy($id)
+    {
+        // ...
+    }
+}
+

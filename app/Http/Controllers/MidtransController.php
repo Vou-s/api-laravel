@@ -2,120 +2,127 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateMidtransRequest;
+use App\Http\Requests\UpdateMidtransRequest;
+use App\Http\Controllers\AppBaseController;
+use App\Repositories\MidtransRepository;
 use Illuminate\Http\Request;
-use App\Models\Order;
-use Midtrans\Config;
-use Midtrans\Snap;
-use Midtrans\Notification;
-use Illuminate\Support\Facades\Log;
+use Flash;
 
-class MidtransController extends Controller
+class MidtransController extends AppBaseController
 {
-    public function __construct()
+    /** @var MidtransRepository $midtransRepository*/
+    private $midtransRepository;
+
+    public function __construct(MidtransRepository $midtransRepo)
     {
-        \Midtrans\Config::$serverKey = config('services.midtrans.serverKey');
-        \Midtrans\Config::$isProduction = config('services.midtrans.isProduction');
-        \Midtrans\Config::$isSanitized = true;
-        \Midtrans\Config::$is3ds = true;
+        $this->midtransRepository = $midtransRepo;
     }
 
-    public function getToken($orderId)
+    /**
+     * Display a listing of the Midtrans.
+     */
+    public function index(Request $request)
     {
-        try {
-            $order = Order::with(['user', 'items.product'])->findOrFail($orderId);
+        $midtrans = $this->midtransRepository->paginate(10);
 
-            if (!$order || (float)$order->total_amount <= 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Total amount tidak valid (<= 0)',
-                ], 400);
-            }
-
-            $params = [
-                'transaction_details' => [
-                    'order_id'     => 'ORDER-' . $order->id,
-                    'gross_amount' => max(100, (float) $order->total_amount), // ✅ minimal Rp100
-                ],
-                'customer_details' => [
-                    'first_name' => $order->user->name,
-                    'email'      => $order->user->email,
-                    'phone'      => $order->user->phone ?? '0811111111',
-                ],
-                'item_details' => $order->items->map(function ($item) {
-                    return [
-                        'id'       => $item->product_id,
-                        'price'    => max(100, (float) $item->price), // ✅ float
-                        'quantity' => (int) $item->quantity,
-                        'name'     => $item->product->name ?? 'Unknown',
-                    ];
-                })->toArray(),
-            ];
-
-            // ✅ Logging untuk debug
-            Log::info('Midtrans Request Params', $params);
-
-            $snapToken = Snap::getSnapToken($params);
-
-            return response()->json([
-                'success' => true,
-                'token'   => $snapToken
-            ]);
-        } catch (\Exception $e) {
-            Log::error("Midtrans error: " . $e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal ambil snap token',
-                'error'   => $e->getMessage()
-            ], 500);
-        }
+        return view('midtrans.index')
+            ->with('midtrans', $midtrans);
     }
 
-    public function callback(Request $request)
+    /**
+     * Show the form for creating a new Midtrans.
+     */
+    public function create()
     {
-        try {
-            $notification = new Notification();
+        return view('midtrans.create');
+    }
 
-            $orderId = (int) str_replace('ORDER-', '', $notification->order_id);
-            $order   = Order::find($orderId);
+    /**
+     * Store a newly created Midtrans in storage.
+     */
+    public function store(CreateMidtransRequest $request)
+    {
+        $input = $request->all();
 
-            if (!$order) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Order tidak ditemukan'
-                ], 404);
-            }
+        $midtrans = $this->midtransRepository->create($input);
 
-            switch ($notification->transaction_status) {
-                case 'capture':
-                case 'settlement':
-                    $order->status = 'paid';
-                    break;
-                case 'pending':
-                    $order->status = 'pending';
-                    break;
-                case 'deny':
-                case 'expire':
-                case 'cancel':
-                    $order->status = 'failed';
-                    break;
-            }
+        Flash::success('Midtrans saved successfully.');
 
-            $order->save();
+        return redirect(route('midtrans.index'));
+    }
 
-            Log::info("Midtrans Callback Update", [
-                'order_id' => $orderId,
-                'status'   => $order->status
-            ]);
+    /**
+     * Display the specified Midtrans.
+     */
+    public function show($id)
+    {
+        $midtrans = $this->midtransRepository->find($id);
 
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            Log::error("Midtrans Callback Error: " . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Callback gagal',
-                'error'   => $e->getMessage()
-            ], 500);
+        if (empty($midtrans)) {
+            Flash::error('Midtrans not found');
+
+            return redirect(route('midtrans.index'));
         }
+
+        return view('midtrans.show')->with('midtrans', $midtrans);
+    }
+
+    /**
+     * Show the form for editing the specified Midtrans.
+     */
+    public function edit($id)
+    {
+        $midtrans = $this->midtransRepository->find($id);
+
+        if (empty($midtrans)) {
+            Flash::error('Midtrans not found');
+
+            return redirect(route('midtrans.index'));
+        }
+
+        return view('midtrans.edit')->with('midtrans', $midtrans);
+    }
+
+    /**
+     * Update the specified Midtrans in storage.
+     */
+    public function update($id, UpdateMidtransRequest $request)
+    {
+        $midtrans = $this->midtransRepository->find($id);
+
+        if (empty($midtrans)) {
+            Flash::error('Midtrans not found');
+
+            return redirect(route('midtrans.index'));
+        }
+
+        $midtrans = $this->midtransRepository->update($request->all(), $id);
+
+        Flash::success('Midtrans updated successfully.');
+
+        return redirect(route('midtrans.index'));
+    }
+
+    /**
+     * Remove the specified Midtrans from storage.
+     *
+     * @throws \Exception
+     */
+    public function destroy($id)
+    {
+        $midtrans = $this->midtransRepository->find($id);
+
+        if (empty($midtrans)) {
+            Flash::error('Midtrans not found');
+
+            return redirect(route('midtrans.index'));
+        }
+
+        $this->midtransRepository->delete($id);
+
+        Flash::success('Midtrans deleted successfully.');
+
+        return redirect(route('midtrans.index'));
     }
 }

@@ -2,17 +2,35 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Subcategory extends Model
+class SubCategory extends Model
 {
-    use HasFactory;
-    protected $fillable = ['name', 'category_id'];
+    public $table = 'subcategories';
 
-    public function category()
+    public $fillable = [
+        'name',
+        'category_id'
+    ];
+
+    protected $casts = [
+        'name' => 'string'
+    ];
+
+    public static array $rules = [
+        'name' => 'required|string|max:255',
+        'category_id' => 'required',
+        'created_at' => 'nullable',
+        'updated_at' => 'nullable'
+    ];
+
+    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(\App\Models\Category::class, 'category_id');
+    }
+
+    public function products(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Product::class, 'subcategory_id');
     }
 }
-

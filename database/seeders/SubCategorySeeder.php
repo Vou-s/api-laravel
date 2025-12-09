@@ -3,48 +3,29 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Subcategory;
+use App\Models\Category;
 
 class SubcategorySeeder extends Seeder
 {
     public function run(): void
     {
-        $categories = [
-            'Elektronik' => ['HP', 'Laptop', 'Case'],
-            'Fashion'   => ['Baju', 'Tas', 'Sepatu'],
-            'Peralatan' => ['Alat Rumah Tangga', 'Perkakas'],
-            'Lainnya'   => [],
+        $subcategories = [
+            ['name' => 'Mobile Phones', 'category' => 'Electronics'],
+            ['name' => 'Laptops', 'category' => 'Electronics'],
+            ['name' => 'Men\'s Clothing', 'category' => 'Clothing'],
+            ['name' => 'Women\'s Clothing', 'category' => 'Clothing'],
+            ['name' => 'Fiction', 'category' => 'Books'],
+            ['name' => 'Non-Fiction', 'category' => 'Books'],
         ];
 
-        foreach ($categories as $catName => $subs) {
-            // Cek kategori, insert kalau belum ada
-            $category = DB::table('categories')->where('name', $catName)->first();
-
-            if (!$category) {
-                $categoryId = DB::table('categories')->insertGetId([
-                    'name'       => $catName,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+        foreach ($subcategories as $sub) {
+            $category = Category::where('name', $sub['category'])->first();
+            if ($category) {
+                Subcategory::create([
+                    'name' => $sub['name'],
+                    'category_id' => $category->id
                 ]);
-            } else {
-                $categoryId = $category->id;
-            }
-
-            // Tambahkan subkategori jika belum ada
-            foreach ($subs as $subName) {
-                $exists = DB::table('subcategories')
-                    ->where('category_id', $categoryId)
-                    ->where('name', $subName)
-                    ->exists();
-
-                if (!$exists) {
-                    DB::table('subcategories')->insert([
-                        'category_id' => $categoryId,
-                        'name'        => $subName,
-                        'created_at'  => now(),
-                        'updated_at'  => now(),
-                    ]);
-                }
             }
         }
     }
