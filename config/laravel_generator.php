@@ -146,6 +146,8 @@ return [
 
         'swagger' => true, // generate swagger for your APIs
 
+        'swagger_file' => 'api-docs.json', // optional
+
         'tests' => false, // generate test cases for your APIs
 
         'excluded_fields' => ['id'], // Array of columns that doesn't required while creating module
