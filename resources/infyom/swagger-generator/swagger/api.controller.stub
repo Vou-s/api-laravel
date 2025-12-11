@@ -19,9 +19,11 @@ class DummyClass extends Controller
      *     path="/DummyModelNameLC",
      *     tags={"DummyModelName"},
      *     summary="Get list of DummyModelName",
+     *     operationId="getDummyModelNameList",
      *     @OA\Response(
      *         response=200,
-     *         description="Successful operation"
+     *         description="Successful operation",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/DummyModelName"))
      *     )
      * )
      */
@@ -35,11 +37,16 @@ class DummyClass extends Controller
      *     path="/DummyModelNameLC",
      *     tags={"DummyModelName"},
      *     summary="Create new DummyModelName",
+     *     operationId="createDummyModelName",
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/DummyModelName")
+     *         @OA\JsonContent(ref="#/components/schemas/DummyModelNameCreate")
      *     ),
-     *     @OA\Response(response=200, description="Created")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Created",
+     *         @OA\JsonContent(ref="#/components/schemas/DummyModelName")
+     *     )
      * )
      */
     public function store(DummyCreateRequest $request)
@@ -52,13 +59,18 @@ class DummyClass extends Controller
      *     path="/DummyModelNameLC/{id}",
      *     tags={"DummyModelName"},
      *     summary="Get DummyModelName detail",
+     *     operationId="getDummyModelName",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         @OA\Schema(type="integer")
      *     ),
-     *     @OA\Response(response=200, description="Success"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success",
+     *         @OA\JsonContent(ref="#/components/schemas/DummyModelName")
+     *     ),
      *     @OA\Response(response=404, description="Not found")
      * )
      */
@@ -72,6 +84,7 @@ class DummyClass extends Controller
      *     path="/DummyModelNameLC/{id}",
      *     tags={"DummyModelName"},
      *     summary="Update DummyModelName",
+     *     operationId="updateDummyModelName",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -80,9 +93,13 @@ class DummyClass extends Controller
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/DummyModelName")
+     *         @OA\JsonContent(ref="#/components/schemas/DummyModelNameUpdate")
      *     ),
-     *     @OA\Response(response=200, description="Updated")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Updated",
+     *         @OA\JsonContent(ref="#/components/schemas/DummyModelName")
+     *     )
      * )
      */
     public function update($id, DummyUpdateRequest $request)
@@ -95,13 +112,18 @@ class DummyClass extends Controller
      *     path="/DummyModelNameLC/{id}",
      *     tags={"DummyModelName"},
      *     summary="Delete DummyModelName",
+     *     operationId="deleteDummyModelName",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         @OA\Schema(type="integer")
      *     ),
-     *     @OA\Response(response=200, description="Deleted")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Deleted",
+     *         @OA\JsonContent(type="object", example={"message":"Deleted"})
+     *     )
      * )
      */
     public function destroy($id)
@@ -109,4 +131,3 @@ class DummyClass extends Controller
         // ...
     }
 }
-
