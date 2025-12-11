@@ -40,19 +40,22 @@ php artisan make:factory UserFactory --model=User
 php artisan optimize
 php artisan l5-swagger:generate
 
+php artisan infyom:generate:swagger
+
+
 php artisan infyom:api make:models --fromTable --table=categories --prefix=admin
 
 
 ## regenerate overwrite
-php artisan infyom:api Products --fromTable --table=products --prefix=admin --force
+php artisan infyom:api Products --fromTable --table=products --prefix=admin 
 
-php artisan infyom:api Users --fromTable --table=users --prefix=admin --force
+php artisan infyom:api Users --fromTable --table=users --prefix=admin 
 
-php artisan infyom:api Orders --fromTable --table=orders --prefix=admin --force
+php artisan infyom:api Orders --fromTable --table=orders --prefix=admin 
 
-php artisan infyom:api Order_Items --fromTable --table=order_items --prefix=admin --force
+php artisan infyom:api Order_Items --fromTable --table=order_items --prefix=admin 
 
-php artisan infyom:api Payments --fromTable --table=payments --prefix=admin --force
+php artisan infyom:api Payments --fromTable --table=payments --prefix=admin 
 
 
 
@@ -66,6 +69,7 @@ php artisan infyom:api Orders --fromTable --table=orders --prefix=admin --no-int
 php artisan infyom:api Order_Items --fromTable --table=order_items --prefix=admin --no-interaction
 
 php artisan infyom:api Payments --fromTable --table=payments --prefix=admin --no-interaction
+
 
 
 
